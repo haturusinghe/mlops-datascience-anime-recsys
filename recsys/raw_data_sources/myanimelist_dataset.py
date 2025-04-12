@@ -22,4 +22,7 @@ def extract_anime_data() -> pl.DataFrame:
     columns_to_drop = [name for name in column_names if "_dupe" in name]
     joined_df = joined_df.drop(columns_to_drop)
 
+    # rename column synopsis to synopsis
+    joined_df = joined_df.rename({"sypnopsis": "Synopsis"})
+
     return joined_df
