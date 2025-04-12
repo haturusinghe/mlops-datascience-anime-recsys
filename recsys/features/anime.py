@@ -11,11 +11,9 @@ def get_anime_id(df : pl.DataFrame) -> pl.Series:
 
 
 def create_anime_description(row):
-    description = f"{row['Name']} is a {row['Type']} anime with a rating of {row['Score']}/10.\n"
-    description += f"It has {row['Episodes']} episodes and was released in {row['Aired']}. "
-    description += f"It is rated {row['Rating']} and it is ranked {row['Popularity']}, of Most Popular Anime.\n"
+    description = f"This is a {row['Type']} anime.\n"
     description += f"It belongs to the {row['Genres']} genres.\n"
-    description += f"It has a synopsis of {row['Synopsis']}\n"
+    description += f"It has a synopsis : {row['Synopsis']}\n"
 
     return description
 
