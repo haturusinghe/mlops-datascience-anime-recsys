@@ -28,5 +28,9 @@ class Settings(BaseSettings):
     # USER_DATASET_SIZE determines the size of the user dataset, with a default value of LARGE.
     USER_DATASET_SIZE: UserDatasetSize = UserDatasetSize.LARGE
 
+    # SentenceTransformer model ID for generating embeddings.
+    FEATURES_EMBEDDING_MODEL_ID: str = "all-MiniLM-L6-v2"
+
+
 
 settings = Settings()  # Create an instance of the Settings class to access the configuration.
