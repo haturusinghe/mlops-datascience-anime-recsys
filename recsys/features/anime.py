@@ -60,3 +60,51 @@ def compute_features_of_anime(df: pl.DataFrame) -> pl.DataFrame:
     df = df.drop_nulls(selected_columns)
 
     return df
+
+def generate_embeddings_for_dataframe(
+    df: pl.DataFrame,
+    text_col: str,
+    model: SentenceTransformer,
+    batch_size: int = 32,
+) -> pl.DataFrame:
+    """
+    Generate embeddings for a specified text column in a DataFrame using a SentenceTransformer model.
+
+    Args:
+        df (pl.DataFrame): The DataFrame containing the text data.
+        text_col (str): The name of the column containing the text data.
+        model (SentenceTransformer): The SentenceTransformer model to use for generating embeddings.
+        batch_size (int, optional): The batch size for processing. Defaults to 32.
+
+    Returns:
+        pl.DataFrame: The DataFrame with an additional column for embeddings.
+    """
+
+    @contextlib.contextmanager
+    def suppress_stdout():
+        new_stdout = io.StringIO()
+        old_stdout = sys.stdout
+        sys.stdout = new_stdout
+        try:
+            yield new_stdout
+        finally:
+            sys.stdout = old_stdout
+
+    total_rows = len(df)
+    progress_bar = tqdm(total=total_rows, desc="Generating embeddings", unit="row")
+
+    texts = df[text_col].to_list()
+    all_embeddings = []
+
+    for i in range(0,total_rows, batch_size):
+        batch = texts[i:i + batch_size]
+        with suppress_stdout():
+            embeddings = model.encode(batch, show_progress_bar=False)
+        all_embeddings.extend(embeddings) # the .extend actually extends the list by adding the elements of the iterable
+        progress_bar.update(len(batch))
+
+    df_with_embeddings = df.with_columns(
+        pl.Series("embeddings", all_embeddings)
+    )
+    progress_bar.close()
+    return df_with_embeddings
