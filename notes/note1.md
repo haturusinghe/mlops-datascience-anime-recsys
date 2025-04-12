@@ -1,0 +1,1 @@
+from animelist for each user get their top 10, and from those top 10 get like genres and other stuff to build a profile about them
