@@ -6,9 +6,8 @@ def compute_features_of_user(df: pl.DataFrame) -> pl.DataFrame:
 
     This function does the following:
     1. Checks for required columns in the input DataFrame
-    2. Sorts data by user_id and by rating (descending)
-    3. Groups data by user_id
-    4. For each user, aggregates the top 20 anime IDs and their ratings
+    2. Groups data by user_id
+    3. For each user, sorts by rating (descending) and aggregates the top 20 anime IDs and ratings
 
     Parameters:
     - df (pl.DataFrame): Input DataFrame containing user rating data.
@@ -27,9 +26,12 @@ def compute_features_of_user(df: pl.DataFrame) -> pl.DataFrame:
     if missing_columns:
         raise ValueError(f"Missing {','.join(missing_columns)} columns in dataframe")
     
-    df = df.sort('user_id').sort('rating', descending=True).group_by('user_id').agg(
-        pl.col("anime_id").list.head(20).alias("top_anime"), 
-        pl.col('rating').list.head(20).alias("top_ratings")
+    # First sort the entire dataframe by user_id and then by rating (descending)
+    # Then group by user_id
+    result = df.group_by('user_id').agg(
+        # Sort anime_ids and ratings by rating in descending order within each group
+        pl.col('anime_id').sort_by(pl.col('rating'), descending=True).list.head(20).alias("top_anime"),
+        pl.col('rating').sort_by(pl.col('rating'), descending=True).list.head(20).alias("top_ratings")
     )
-
-    return df
+    
+    return result
