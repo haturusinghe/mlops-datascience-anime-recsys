@@ -6,8 +6,9 @@ def compute_features_of_user(df: pl.DataFrame) -> pl.DataFrame:
 
     This function does the following:
     1. Checks for required columns in the input DataFrame
-    2. Groups data by user_id
-    3. For each user, sorts by rating (descending) and aggregates the top 20 anime IDs and ratings
+    2. Sorts data by user_id and rating (descending)
+    3. Groups data by user_id
+    4. For each user, aggregates the top 20 anime IDs and their ratings
 
     Parameters:
     - df (pl.DataFrame): Input DataFrame containing user rating data.
@@ -19,19 +20,26 @@ def compute_features_of_user(df: pl.DataFrame) -> pl.DataFrame:
     - ValueError: If any of the required columns are missing from the input DataFrame.
     """
 
-    required_columns = ['user_id', 'anime_id', 'rating']
+    required_columns = {'user_id', 'anime_id', 'rating'}
 
-    missing_columns = [col for col in required_columns if col not in df.columns]
-
+    # Check for missing columns
+    missing_columns = required_columns - set(df.columns)
     if missing_columns:
-        raise ValueError(f"Missing {','.join(missing_columns)} columns in dataframe")
-    
-    # First sort the entire dataframe by user_id and then by rating (descending)
-    # Then group by user_id
-    result = df.group_by('user_id').agg(
-        # Sort anime_ids and ratings by rating in descending order within each group
-        pl.col('anime_id').sort_by(pl.col('rating'), descending=True).list.head(5).alias("top_anime"),
-        pl.col('rating').sort_by(pl.col('rating'), descending=True).list.head(5).alias("top_ratings")
-    )
-    
+        raise ValueError(f"The following required columns are missing from the DataFrame: {', '.join(missing_columns)}")
+
+    # Sort by user_id (ascending) and rating (descending)
+    df_sorted = df.sort(["user_id", "rating"], descending=[False, True])
+
+    # Group by user_id and collect the anime_id and rating values as lists
+    result = df_sorted.group_by('user_id').agg([
+        pl.col('anime_id').list().alias("top_anime"),
+        pl.col('rating').list().alias("top_ratings")
+    ])
+
+    # Limit each list to at most 20 items
+    result = result.with_columns([
+        pl.col('top_anime').arr.head(20).alias('top_anime'),
+        pl.col('top_ratings').arr.head(20).alias('top_ratings')
+    ])
+
     return result
