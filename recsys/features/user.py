@@ -30,8 +30,8 @@ def compute_features_of_user(df: pl.DataFrame) -> pl.DataFrame:
     # Then group by user_id
     result = df.group_by('user_id').agg(
         # Sort anime_ids and ratings by rating in descending order within each group
-        pl.col('anime_id').sort_by(pl.col('rating'), descending=True).list.head(20).alias("top_anime"),
-        pl.col('rating').sort_by(pl.col('rating'), descending=True).list.head(20).alias("top_ratings")
+        pl.col('anime_id').sort_by(pl.col('rating'), descending=True).list.head(5).alias("top_anime"),
+        pl.col('rating').sort_by(pl.col('rating'), descending=True).list.head(5).alias("top_ratings")
     )
     
     return result
