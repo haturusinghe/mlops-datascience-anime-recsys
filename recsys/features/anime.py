@@ -61,7 +61,7 @@ def compute_features_of_anime(df: pl.DataFrame) -> pl.DataFrame:
 
 def generate_embeddings_for_dataframe(
     df: pl.DataFrame,
-    text_col: str,
+    embedding_column_name: str,
     model: SentenceTransformer,
     batch_size: int = 32,
 ) -> pl.DataFrame:
@@ -91,7 +91,7 @@ def generate_embeddings_for_dataframe(
     total_rows = len(df)
     progress_bar = tqdm(total=total_rows, desc="Generating embeddings", unit="row")
 
-    texts = df[text_col].to_list()
+    texts = df[embedding_column_name].to_list()
     all_embeddings = []
 
     for i in range(0,total_rows, batch_size):
