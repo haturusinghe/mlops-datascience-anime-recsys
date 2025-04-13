@@ -33,7 +33,7 @@ def download_and_extract_from_kaggle():
     # Download to the specified path
     download_path = kagglehub.dataset_download(
         "hernan4444/anime-recommendation-database-2020",
-        path=str(kaggle_dir)
+        # path=str(kaggle_dir)
     )
 
     logger.info(f"Downloaded dataset to {download_path}")
