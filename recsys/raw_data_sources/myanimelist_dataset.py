@@ -1,5 +1,44 @@
 import polars as pl
 from pathlib import Path
+import kagglehub
+from loguru import logger
+
+
+def check_files_exists():
+    """
+    Check if the required CSV files exist in the specified directory.
+
+    Raises:
+        FileNotFoundError: If any of the required CSV files are not found.
+    """
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    csv_path = base_dir / "kaggle" / "anime.csv"
+    synopsis_csv_path = base_dir / "kaggle" / "anime_with_synopsis.csv"
+    user_csv_path = base_dir / "kaggle" / "rating_complete.csv"
+
+    if not csv_path.exists():
+        raise FileNotFoundError(f"{csv_path} does not exist.")
+    if not synopsis_csv_path.exists():
+        raise FileNotFoundError(f"{synopsis_csv_path} does not exist.")
+    if not user_csv_path.exists():
+        raise FileNotFoundError(f"{user_csv_path} does not exist.")
+
+def download_and_extract_from_kaggle():
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    kaggle_dir = base_dir / "kaggle"
+
+    # Create the directory if it doesn't exist
+    kaggle_dir.mkdir(parents=True, exist_ok=True)
+
+    # Download to the specified path
+    download_path = kagglehub.dataset_download(
+        "hernan4444/anime-recommendation-database-2020",
+        path=str(kaggle_dir)
+    )
+
+    logger.info(f"Downloaded dataset to {download_path}")
+
+    
 
 def extract_anime_data() -> pl.DataFrame:
     """
@@ -9,6 +48,16 @@ def extract_anime_data() -> pl.DataFrame:
         pl.DataFrame: A DataFrame containing the anime data.
     """
     # __file__ is the current file, so go two directories up to the project root.
+
+    # Check if the files exist
+    try:
+        check_files_exists()
+    except FileNotFoundError:
+        logger.info("Files do not exist. Downloading from Kaggle...")
+        download_and_extract_from_kaggle()
+        check_files_exists()
+        logger.info("Files downloaded successfully.")
+
     base_dir = Path(__file__).resolve().parent.parent.parent
     csv_path = base_dir / "kaggle" / "anime.csv"
     synopsis_csv_path = base_dir / "kaggle" / "anime_with_synopsis.csv"
