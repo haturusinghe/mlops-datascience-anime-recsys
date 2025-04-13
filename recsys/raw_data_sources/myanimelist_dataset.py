@@ -26,3 +26,19 @@ def extract_anime_data() -> pl.DataFrame:
     joined_df = joined_df.rename({"sypnopsis": "Synopsis"})
 
     return joined_df
+
+def extract_user_data() -> pl.DataFrame:
+    """
+    Extracts user data from the MyAnimeList dataset.
+
+    Returns:
+        pl.DataFrame: A DataFrame containing the user data.
+    """
+    # __file__ is the current file, so go two directories up to the project root.
+    base_dir = Path(__file__).parent.parent.parent
+    # csv_path = base_dir / "kaggle" / "animelist.csv"
+    csv_path = base_dir / "kaggle" / "rating_complete.csv"
+
+    df = pl.read_csv(csv_path, null_values=["Unknown"])
+
+    return df
