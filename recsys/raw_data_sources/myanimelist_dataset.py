@@ -24,19 +24,34 @@ def check_files_exists():
         raise FileNotFoundError(f"{user_csv_path} does not exist.")
 
 def download_and_extract_from_kaggle():
+    import shutil
+    import os
+    
     base_dir = Path(__file__).resolve().parent.parent.parent
     kaggle_dir = base_dir / "kaggle"
 
     # Create the directory if it doesn't exist
     kaggle_dir.mkdir(parents=True, exist_ok=True)
 
-    # Download to the specified path
+    # Download to the cache (default behavior)
     download_path = kagglehub.dataset_download(
         "hernan4444/anime-recommendation-database-2020",
-        # path=str(kaggle_dir)
     )
-
+    
     logger.info(f"Downloaded dataset to {download_path}")
+    
+    # Copy required CSV files to the kaggle_dir
+    required_files = ["anime.csv", "anime_with_synopsis.csv", "rating_complete.csv"]
+    for file in required_files:
+        source_file = Path(download_path) / file
+        if source_file.exists():
+            target_file = kaggle_dir / file
+            shutil.copy2(source_file, target_file)
+            logger.info(f"Copied {file} to {target_file}")
+        else:
+            logger.error(f"Required file {file} not found in {download_path}")
+    
+    return kaggle_dir
 
     
 
