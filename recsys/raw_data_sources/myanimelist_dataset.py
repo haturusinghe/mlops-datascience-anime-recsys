@@ -173,3 +173,28 @@ def extract_user_data() -> pl.DataFrame:
     df = pl.read_csv(csv_path, null_values=["Unknown"])
 
     return df
+
+
+def extract_ratings_data() -> pl.DataFrame:
+    """
+    Extracts ratings data from the MyAnimeList dataset.
+
+    Returns:
+        pl.DataFrame: A DataFrame containing the ratings data.
+    """
+    # Check if the files exist
+    try:
+        check_files_exists()
+    except FileNotFoundError:
+        logger.info("Files do not exist. Downloading from Kaggle...")
+        download_and_extract_from_kaggle()
+        check_files_exists()
+        logger.info("Files downloaded successfully.")
+
+    # Use resolve() to ensure absolute path
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    csv_path = base_dir / "kaggle" / "animelist.csv"
+
+    df = pl.read_csv(csv_path, null_values=["Unknown"])
+
+    return df
