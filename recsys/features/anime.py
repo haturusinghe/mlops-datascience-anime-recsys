@@ -6,8 +6,8 @@ import polars as pl
 from tqdm.auto import tqdm
 from sentence_transformers import SentenceTransformer
 
-def get_anime_id(df : pl.DataFrame) -> pl.Series:
-    return df['MAL_ID'].cast(pl.Utf8)
+def get_anime_id(df : pl.DataFrame, id_column:str = 'MAL_ID') -> pl.Series:
+    return df[id_column].cast(pl.Utf8)
 
 
 def create_anime_description(row):
