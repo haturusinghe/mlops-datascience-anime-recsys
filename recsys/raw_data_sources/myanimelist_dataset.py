@@ -90,7 +90,7 @@ def extract_user_data() -> pl.DataFrame:
     return df
 
 
-def extract_ratings_data() -> pl.DataFrame:
+def extract_ratings_data(limit_rows:bool = False) -> pl.DataFrame:
     """
     Extracts ratings data from the MyAnimeList dataset.
 
@@ -110,6 +110,9 @@ def extract_ratings_data() -> pl.DataFrame:
     base_dir = Path(__file__).resolve().parent.parent.parent
     csv_path = base_dir / "kaggle" / "animelist.csv"
 
-    df = pl.read_csv(csv_path, null_values=["Unknown"])
-
+    if not limit_rows:
+        df = pl.read_csv(csv_path, null_values=["Unknown"])
+    else:
+        # Read only the first 100 rows
+        df = pl.read_csv(csv_path, null_values=["Unknown"], n_rows=10000)
     return df
