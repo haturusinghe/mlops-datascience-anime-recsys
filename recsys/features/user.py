@@ -48,8 +48,8 @@ def compute_features_of_user(df: pl.DataFrame) -> pl.DataFrame:
 
     # Limit each list to at most 20 items using .list.head() for Polars 1.9.0
     result = result.with_columns([
-        pl.col('top_anime').list.head(10).alias('top_anime'),
-        pl.col('top_ratings').list.head(10).alias('top_ratings')
+        pl.col('top_anime').list.head(20).alias('top_anime'),
+        pl.col('top_ratings').list.head(20).alias('top_ratings')
     ])
 
     return result
