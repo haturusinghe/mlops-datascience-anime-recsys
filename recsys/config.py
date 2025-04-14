@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     # SentenceTransformer model ID for generating embeddings.
     FEATURES_EMBEDDING_MODEL_ID: str = "all-MiniLM-L6-v2"
 
+    SEED: int = 42  # Seed for random number generation.
+
 
 
 settings = Settings()  # Create an instance of the Settings class to access the configuration.
